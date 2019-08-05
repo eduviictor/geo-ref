@@ -31,6 +31,10 @@ target 'geo_ref' do
 
   pod 'react-native-camera', :path => '../node_modules/react-native-camera'
 
+  pod 'ReactNativePermissions', :path => '../node_modules/react-native-permissions'
+
+  pod 'react-native-geolocation', :path => '../node_modules/@react-native-community/geolocation'
+
   target 'geo_refTests' do
     inherit! :search_paths
     # Pods for testing

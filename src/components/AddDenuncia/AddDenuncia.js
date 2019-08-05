@@ -1,6 +1,8 @@
 import React, { Component } from "react";
-import { Text, View, StyleSheet, Image } from "react-native";
+import { Text, View, StyleSheet, Alert } from "react-native";
 import { withNavigationFocus } from "react-navigation";
+import Permissions from "react-native-permissions";
+import Geolocation from "@react-native-community/geolocation";
 import {
   Container,
   Content,
@@ -8,7 +10,8 @@ import {
   Item,
   Input,
   Button,
-  Picker
+  Picker,
+  Thumbnail
 } from "native-base";
 
 const problems = [
@@ -31,11 +34,71 @@ class AddDenuncia extends Component {
     title: "Adicionar Denuncia"
   };
 
+  state = {
+    location: null,
+    locationPermission: null
+  };
+
+  // requestPermissionLocation = async () => {
+  //   try {
+  //     const granted = await PermissionsAndroid.request(
+  //       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+  //       {
+  //         title: "Example App",
+  //         message: "Example App access to your location "
+  //       }
+  //     )
+  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+  //       console.log("You can use the location")
+  //       alert("You can use the location");
+  //     } else {
+  //       console.log("location permission denied")
+  //       alert("Location permission denied");
+  //     }
+  //   } catch (err) {
+  //     console.warn(err);
+  //   }
+  // };
+
+  // async componentWillMount() {
+  //   await this.requestPermissionLocation();
+  // }
+
+  componentDidMount() {
+    Permissions.check("location").then(response => {
+      // Response is one of: 'authorized', 'denied', 'restricted', or 'undetermined'
+      this.setState({ locationPermission: response });
+    });
+    this._requestPermission();
+    // Geolocation.setRNConfiguration();
+  }
+
+  _requestPermission = () => {
+    Permissions.request("location").then(response => {
+      // Returns once the user has chosen to 'allow' or to 'not allow' access
+      // Response is one of: 'authorized', 'denied', 'restricted', or 'undetermined'
+      this.setState({ locationPermission: response });
+    });
+  };
+
+  findCoordinates = () => {
+    Geolocation.getCurrentPosition(
+      position => {
+        const location = JSON.stringify(position);
+
+        this.setState({ location });
+      },
+      error => Alert.alert(error.message),
+      {
+        enableHighAccuracy: false,
+        timeout: 20000
+        // maximumAge: 1000
+      }
+    );
+  };
+
   render() {
-    // this.props.isFocused
-    //   ? this.setState({ dataImage: this.props.navigation.getParam("image") })
-    //   : null;
-    // console.log(this.state);
+    console.log(this.state);
     const dataImage =
       this.props.navigation.getParam("image") === undefined
         ? null
@@ -65,28 +128,35 @@ class AddDenuncia extends Component {
               </Picker>
             </Item>
             <Item style={styles.rowImage}>
-              <Image
+              <Thumbnail
+                large
                 source={{
-                  isStatic: true,
                   uri:
                     dataImage !== null
                       ? "data:image/jpeg;base64," + dataImage.base64
-                      : null
-                }}
-                style={{
-                  height: 100,
-                  width: 100,
-                  borderWidth: 1,
-                  borderColor: "black"
+                      : "https://via.placeholder.com/150"
                 }}
               />
               <Button
                 onPress={() => this.props.navigation.navigate("Camera")}
                 light
+                style={{
+                  padding: 10
+                }}
               >
                 <Text>Tirar Foto</Text>
               </Button>
             </Item>
+            <Item style={styles.itemForm}>
+              <Input placeholder="email" />
+            </Item>
+            <Button
+              block
+              style={{ marginTop: 10 }}
+              onPress={this.findCoordinates}
+            >
+              <Text style={styles.textButton}>Achar minhas cordenadas</Text>
+            </Button>
             <Button block style={{ marginTop: 10 }}>
               <Text style={styles.textButton}>Criar Conta</Text>
             </Button>
@@ -128,7 +198,9 @@ const styles = StyleSheet.create({
   },
   rowImage: {
     flexDirection: "row",
-    justifyContent: "space-around"
+    justifyContent: "space-around",
+    paddingTop: 5,
+    paddingBottom: 5
   }
 });
 
