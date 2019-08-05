@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "358021316590",
+    "firebase_url": "https://crud-react-firebase-6b0bd.firebaseio.com",
+    "project_id": "crud-react-firebase-6b0bd",
+    "storage_bucket": "crud-react-firebase-6b0bd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:358021316590:android:bd351451fbc940b5",
+        "android_client_info": {
+          "package_name": "com.geo_ref"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "358021316590-lht8jmiaobp7lug8f40uc5drkqunc1dc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9tHEyORjJXbBwgI3PdiM870GVOOj5VQs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "358021316590-lht8jmiaobp7lug8f40uc5drkqunc1dc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
