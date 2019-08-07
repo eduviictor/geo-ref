@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, View, StyleSheet, Alert } from "react-native";
+import { Text, View, StyleSheet, Alert, ScrollView } from "react-native";
 import { withNavigationFocus } from "react-navigation";
 import Permissions from "react-native-permissions";
 import Geolocation from "@react-native-community/geolocation";
@@ -11,7 +11,8 @@ import {
   Input,
   Button,
   Picker,
-  Thumbnail
+  Thumbnail,
+  Label
 } from "native-base";
 
 const problems = [
@@ -21,7 +22,7 @@ const problems = [
   "Encanamento com vazamento",
   "Emergência de água à superficie",
   "Falta de abastecimento",
-  "Instalação legal",
+  "Instalação ilegal",
   "Esgoto a céu aberto",
   "Esgoto quebrado",
   "Sistema de escoamento danificado/entupido",
@@ -36,33 +37,23 @@ class AddDenuncia extends Component {
 
   state = {
     location: null,
-    locationPermission: null
+    locationPermission: null,
+    adressGeo: null,
+    nome: "",
+    enderecoProblema: "",
+    pontoReferencia: "",
+    problema: "",
+    informacoesAdicionais: "",
+    buttonDisable: false
   };
 
-  // requestPermissionLocation = async () => {
-  //   try {
-  //     const granted = await PermissionsAndroid.request(
-  //       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-  //       {
-  //         title: "Example App",
-  //         message: "Example App access to your location "
-  //       }
-  //     )
-  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-  //       console.log("You can use the location")
-  //       alert("You can use the location");
-  //     } else {
-  //       console.log("location permission denied")
-  //       alert("Location permission denied");
-  //     }
-  //   } catch (err) {
-  //     console.warn(err);
-  //   }
-  // };
+  handleChange = (value, name) => {
+    this.setState({ [name]: value });
+  };
 
-  // async componentWillMount() {
-  //   await this.requestPermissionLocation();
-  // }
+  onValueChange = value => {
+    this.setState({ problema: value });
+  };
 
   componentDidMount() {
     Permissions.check("location").then(response => {
@@ -84,9 +75,16 @@ class AddDenuncia extends Component {
   findCoordinates = () => {
     Geolocation.getCurrentPosition(
       position => {
-        const location = JSON.stringify(position);
-
-        this.setState({ location });
+        console.log("peguei", position.coords);
+        fetch(
+          "http://nominatim.openstreetmap.org/reverse?lat=" +
+            position.coords.latitude +
+            "&lon=" +
+            position.coords.longitude +
+            "&format=json"
+        )
+          .then(res => console.log("res", res.json()))
+          .catch(err => console.log(err));
       },
       error => Alert.alert(error.message),
       {
@@ -97,72 +95,155 @@ class AddDenuncia extends Component {
     );
   };
 
+  handleEmail = dataImage => {
+    this.setState({ buttonDisable: true });
+    if (this.state.enderecoProblema === "" && !dataImage) {
+      Alert.alert("Campos obrigatórios não preenchidos!");
+    } else if (this.state.enderecoProblema === "" && dataImage) {
+      Alert.alert("Endereço deve ser informado!");
+    } else if (!dataImage && this.state.enderecoProblema !== "") {
+      Alert.alert("Imagem deve ser informada!");
+    } else {
+      const objSend = {
+        problema: this.state.problema,
+        enderecoProblema: this.state.enderecoProblema,
+        pontoReferencia: this.state.pontoReferencia,
+        informacoesAdicionais: this.state.informacoesAdicionais,
+        base64Image: "data:image/jpeg;base64," + dataImage.base64
+      };
+      fetch("https://node-api-nodemailer.herokuapp.com/send", {
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(objSend)
+      })
+        .then(res => {
+          Alert.alert("Denúncia realizada com sucesso!");
+          // () => this.props.navigation.goBack();
+          this.setState({ buttonDisable: false });
+        })
+        .catch(err => {
+          console.log(err);
+          this.setState({ buttonDisable: false });
+        });
+    }
+  };
+
   render() {
-    console.log(this.state);
+    // console.log(this.state);
     const dataImage =
       this.props.navigation.getParam("image") === undefined
         ? null
         : this.props.navigation.getParam("image");
-    console.log(dataImage);
+
     return (
-      <Container style={styles.container}>
-        <Content style={styles.content}>
-          <View style={styles.containerTitle}>
-            <Text style={styles.title}>Cadastre-se: </Text>
-          </View>
-          <Form>
-            <Item style={styles.itemForm}>
-              <Input placeholder="nome" />
-            </Item>
-            <Item style={styles.itemForm}>
-              <Input placeholder="endereco do problema" />
-            </Item>
-            <Item style={styles.itemForm}>
-              <Input placeholder="ponto de referência" />
-            </Item>
-            <Item style={styles.itemForm}>
-              <Picker mode="dropdown" placeholder="Selecione uma opção">
-                {problems.map((item, index) => (
-                  <Picker.Item value={item} label={item} key={index} />
-                ))}
-              </Picker>
-            </Item>
-            <Item style={styles.rowImage}>
-              <Thumbnail
-                large
-                source={{
-                  uri:
-                    dataImage !== null
-                      ? "data:image/jpeg;base64," + dataImage.base64
-                      : "https://via.placeholder.com/150"
-                }}
-              />
-              <Button
-                onPress={() => this.props.navigation.navigate("Camera")}
-                light
-                style={{
-                  padding: 10
-                }}
+      <ScrollView>
+        <Container style={styles.container}>
+          <Content style={styles.content}>
+            <View style={styles.containerTitle}>
+              <Text style={styles.title}>Cadastrar Denúncia</Text>
+            </View>
+            <Form>
+              <Item stackedLabel style={styles.itemForm}>
+                <Label>Nome</Label>
+                <Input
+                  // placeholder="nome"
+                  name="nome"
+                  onChangeText={value => this.handleChange(value, "nome")}
+                  value={this.state.nome}
+                />
+              </Item>
+              <Item stackedLabel style={styles.itemForm}>
+                <Label>*Endereço</Label>
+                <Input
+                  // placeholder="endereco do problema"
+                  name="enderecoProblema"
+                  onChangeText={value =>
+                    this.handleChange(value, "enderecoProblema")
+                  }
+                  value={this.state.enderecoProblema}
+                />
+              </Item>
+              <Item stackedLabel style={styles.itemForm}>
+                <Label>Ponto de referência</Label>
+                <Input
+                  // placeholder="ponto de referência"
+                  name="pontoReferencia"
+                  onChangeText={value =>
+                    this.handleChange(value, "pontoReferencia")
+                  }
+                  value={this.state.pontoReferencia}
+                />
+              </Item>
+
+              <Item style={styles.itemForm}>
+                <Picker
+                  mode="dropdown"
+                  placeholder="Selecione seu problema"
+                  selectedValue={this.state.problema}
+                  onValueChange={this.onValueChange}
+                >
+                  {problems.map((item, index) => (
+                    <Picker.Item value={item} label={item} key={index} />
+                  ))}
+                </Picker>
+              </Item>
+
+              <Item stackedLabel style={styles.rowImage}>
+                <Label>*Imagem</Label>
+                <View style={styles.containerImagem}>
+                  <Thumbnail
+                    large
+                    source={{
+                      uri:
+                        dataImage !== null
+                          ? dataImage.uri
+                          : "https://via.placeholder.com/150"
+                    }}
+                  />
+                  <Button
+                    onPress={() => this.props.navigation.navigate("Camera")}
+                    light
+                    style={{
+                      padding: 10
+                    }}
+                  >
+                    <Text>Tirar Foto</Text>
+                  </Button>
+                </View>
+              </Item>
+              <Item stackedLabel style={styles.itemForm}>
+                <Label>Informações adicionais</Label>
+                <Input
+                  // placeholder="informações adicionais"
+                  name="informacoesAdicionais"
+                  onChangeText={value =>
+                    this.handleChange(value, "informacoesAdicionais")
+                  }
+                  value={this.state.informacoesAdicionais}
+                />
+              </Item>
+              {/* <Button
+                block
+                style={{ marginTop: 10 }}
+                onPress={this.findCoordinates}
               >
-                <Text>Tirar Foto</Text>
+                <Text style={styles.textButton}>Achar minhas cordenadas</Text>
+              </Button> */}
+              <Button
+                disabled={this.state.buttonDisable ? true : false}
+                block
+                style={{ marginTop: 10 }}
+                onPress={() => this.handleEmail(dataImage)}
+              >
+                <Text style={styles.textButton}>Cadastrar Denúncia</Text>
               </Button>
-            </Item>
-            <Item style={styles.itemForm}>
-              <Input placeholder="email" />
-            </Item>
-            <Button
-              block
-              style={{ marginTop: 10 }}
-              onPress={this.findCoordinates}
-            >
-              <Text style={styles.textButton}>Achar minhas cordenadas</Text>
-            </Button>
-            <Button block style={{ marginTop: 10 }}>
-              <Text style={styles.textButton}>Criar Conta</Text>
-            </Button>
-          </Form>
-        </Content>
-      </Container>
+            </Form>
+          </Content>
+        </Container>
+      </ScrollView>
     );
   }
 }
@@ -173,11 +254,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    height: "auto",
     padding: 20
   },
   content: {
     height: "auto",
-    width: "100%"
+    width: "100%",
+    // backgroundColor: "red",
+    // paddingTop: 20,
+    // paddingLeft: 20,
+    // paddingRight: 20
+    // paddingBottom: 20
   },
   containerTitle: {
     flex: 1,
@@ -197,10 +284,18 @@ const styles = StyleSheet.create({
     color: "white"
   },
   rowImage: {
+    // flexDirection: "column",
+    paddingTop: 5,
+    paddingBottom: 5,
+    marginLeft: 0
+  },
+  containerImagem: {
+    flex: 1,
     flexDirection: "row",
     justifyContent: "space-around",
-    paddingTop: 5,
-    paddingBottom: 5
+    alignItems: "center",
+    width: "100%",
+    paddingTop: 5
   }
 });
 

@@ -76,8 +76,8 @@ class App extends Component {
 const AppNavigator = createStackNavigator({
   AddDenuncia,
   App,
-  CriarConta,
   Home,
+  CriarConta,
   Camera
 });
 
