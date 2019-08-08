@@ -9,8 +9,10 @@ import com.facebook.react.bridge.JavaScriptExecutorFactory;
 import com.facebook.react.ReactApplication;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.reactnativecommunity.geolocation.GeolocationPackage;
-//import io.invertase.firebase.RNFirebasePackage;
-//import io.invertase.firebase.auth.RNFirebaseAuthPackage;
+import io.invertase.firebase.RNFirebasePackage;
+import io.invertase.firebase.auth.RNFirebaseAuthPackage;
+import io.invertase.firebase.firestore.RNFirebaseFirestorePackage;
+
 import org.reactnative.camera.RNCameraPackage;
 //import io.invertase.firebase.firestore.RNFirebaseFirestorePackage;
 import com.facebook.react.ReactNativeHost;
@@ -32,9 +34,9 @@ public class MainApplication extends Application implements ReactApplication {
       @SuppressWarnings("UnnecessaryLocalVariable")
       List<ReactPackage> packages = new PackageList(this).getPackages();
       // Packages that cannot be autolinked yet can be added manually here, for example:
-      // packages.add(new MyReactNativePackage());
-//      packages.add(new RNFirebaseAuthPackage());
-//      packages.add(new RNFirebaseFirestorePackage());
+//       packages.add(new MyReactNativePackage());
+      packages.add(new RNFirebaseAuthPackage());
+      packages.add(new RNFirebaseFirestorePackage());
       // packages.add(new RNCameraPackage());
       return packages;
     }

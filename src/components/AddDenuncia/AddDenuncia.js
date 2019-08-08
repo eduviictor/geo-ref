@@ -60,7 +60,7 @@ class AddDenuncia extends Component {
       // Response is one of: 'authorized', 'denied', 'restricted', or 'undetermined'
       this.setState({ locationPermission: response });
     });
-    this._requestPermission();
+    // this._requestPermission();
     // Geolocation.setRNConfiguration();
   }
 
@@ -114,7 +114,7 @@ class AddDenuncia extends Component {
       fetch("https://node-api-nodemailer.herokuapp.com/send", {
         method: "POST",
         headers: {
-          "Accept": "application/json",
+          Accept: "application/json",
           "Content-Type": "application/json"
         },
         body: JSON.stringify(objSend)
@@ -142,9 +142,6 @@ class AddDenuncia extends Component {
       <ScrollView>
         <Container style={styles.container}>
           <Content style={styles.content}>
-            <View style={styles.containerTitle}>
-              <Text style={styles.title}>Cadastrar Denúncia</Text>
-            </View>
             <Form>
               <Item stackedLabel style={styles.itemForm}>
                 <Label>Nome</Label>

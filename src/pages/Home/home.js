@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Text, View, StyleSheet } from "react-native";
 import { Button, Container, Content } from "native-base";
 
-// import firebase from "react-native-firebase";
+import firebase from "react-native-firebase";
 
 export default class Home extends Component {
   static navigationOptions = {
@@ -14,28 +14,28 @@ export default class Home extends Component {
 
     const { navigation } = this.props;
 
-    // this.state = {
-    //   user: navigation.getParam("user")
-    // };
-    // this.unsubscribe = null;
-    // this.ref = firebase.firestore().collection("users");
+    this.state = {
+      user: navigation.getParam("user")
+    };
+    this.unsubscribe = null;
+    this.ref = firebase.firestore().collection("users");
   }
 
-  // componentDidMount() {
-  //   // console.log("ref", this.ref.get().then(() => console.log("teste")));
-  //   this.ref
-  //     .doc(this.state.user.uid)
-  //     .get()
-  //     .then(doc => console.log(doc.data));
-  //   // .get()
-  //   // .then(querySnapshot => {
-  //   //   querySnapshot.forEach(doc => {
-  //   //     console.log(`${doc.id} => ${doc.data()}`);
-  //   //   });
-  //   // })
-  //   // .catch(err => console.log(err));
-  //   // this.unsubscribe = this.ref.onSnapshot(this.getUserFromId);
-  // }
+  componentDidMount() {
+    // console.log("ref", this.ref.get().then(() => console.log("teste")));
+    this.ref
+      .doc(this.state.user.uid)
+      .get()
+      .then(doc => console.log(doc.data));
+    // .get()
+    // .then(querySnapshot => {
+    //   querySnapshot.forEach(doc => {
+    //     console.log(`${doc.id} => ${doc.data()}`);
+    //   });
+    // })
+    // .catch(err => console.log(err));
+    // this.unsubscribe = this.ref.onSnapshot(this.getUserFromId);
+  }
 
   // componentWil
   // componentWillUnmount() {
@@ -62,7 +62,7 @@ export default class Home extends Component {
   // };
 
   render() {
-    // console.log(this.state);
+    console.log(this.state);
     return (
       <Container style={styles.container}>
         {/* <Text> Bem Vindo {this.state.user.displayName}</Text> */}

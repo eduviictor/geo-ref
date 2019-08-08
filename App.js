@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { StyleSheet, View, Text } from "react-native";
 import { Container, Content, Form, Item, Input, Button } from "native-base";
-// import firebase from "react-native-firebase";
+import firebase from "react-native-firebase";
 
 import { createStackNavigator, createAppContainer } from "react-navigation";
 import CriarConta from "./src/pages/CriarConta/criar-conta";
@@ -13,26 +13,30 @@ class App extends Component {
   state = {
     emailAuth: "",
     passwordAuth: "",
-    user: null
+    user: null,
+    loginDisable: false
   };
 
   static navigationOptions = {
     title: "GeoRef"
   };
 
-  // login = async () => {
-  //   const { emailAuth, passwordAuth } = this.state;
+  login = async () => {
+    this.setState({ loginDisable: true });
+    const { emailAuth, passwordAuth } = this.state;
 
-  //   try {
-  //     const { user } = await firebase
-  //       .auth()
-  //       .signInWithEmailAndPassword(emailAuth, passwordAuth);
-  //     this.setState({ user, emailAuth: "", passwordAuth: "" });
-  //     this.props.navigation.navigate("Home", { user: this.state.user });
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
+    try {
+      const { user } = await firebase
+        .auth()
+        .signInWithEmailAndPassword(emailAuth, passwordAuth);
+      this.setState({ user, emailAuth: "", passwordAuth: "" });
+      this.props.navigation.navigate("Home", { user: this.state.user });
+      this.setState({ loginDisable: false });
+    } catch (err) {
+      console.log(err);
+      this.setState({ loginDisable: false });
+    }
+  };
 
   render() {
     return (
@@ -56,7 +60,12 @@ class App extends Component {
                 onChangeText={passwordAuth => this.setState({ passwordAuth })}
               />
             </Item>
-            {/* <Button block style={{ marginTop: 10 }} onPress={{*this.login}}>
+            <Button
+              block
+              style={{ marginTop: 10 }}
+              disabled={this.state.loginDisable}
+              onPress={this.login}
+            >
               <Text style={styles.textButton}>Fazer Login</Text>
             </Button>
             <Button
@@ -65,7 +74,7 @@ class App extends Component {
               onPress={() => this.props.navigation.navigate("CriarConta")}
             >
               <Text style={styles.textButton}>Criar Conta</Text>
-            </Button> */}
+            </Button>
           </Form>
         </Content>
       </Container>
@@ -74,9 +83,9 @@ class App extends Component {
 }
 
 const AppNavigator = createStackNavigator({
-  Home,
-  App,
   AddDenuncia,
+  App,
+  Home,
   CriarConta,
   Camera
 });
