@@ -2,11 +2,11 @@ import React, { Component } from "react";
 import { Text, View, StyleSheet } from "react-native";
 import { Button, Container, Content } from "native-base";
 
-import firebase from "react-native-firebase";
+// import firebase from "react-native-firebase";
 
 export default class Home extends Component {
   static navigationOptions = {
-    title: "Home"
+    title: "GeoRef"
   };
 
   constructor(props) {
@@ -14,11 +14,11 @@ export default class Home extends Component {
 
     const { navigation } = this.props;
 
-    this.state = {
-      user: navigation.getParam("user")
-    };
-    this.unsubscribe = null;
-    this.ref = firebase.firestore().collection("users");
+    // this.state = {
+    //   user: navigation.getParam("user")
+    // };
+    // this.unsubscribe = null;
+    // this.ref = firebase.firestore().collection("users");
   }
 
   // componentDidMount() {

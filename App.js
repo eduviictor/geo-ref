@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { StyleSheet, View, Text } from "react-native";
 import { Container, Content, Form, Item, Input, Button } from "native-base";
-import firebase from "react-native-firebase";
+// import firebase from "react-native-firebase";
 
 import { createStackNavigator, createAppContainer } from "react-navigation";
 import CriarConta from "./src/pages/CriarConta/criar-conta";
@@ -20,19 +20,19 @@ class App extends Component {
     title: "GeoRef"
   };
 
-  login = async () => {
-    const { emailAuth, passwordAuth } = this.state;
+  // login = async () => {
+  //   const { emailAuth, passwordAuth } = this.state;
 
-    try {
-      const { user } = await firebase
-        .auth()
-        .signInWithEmailAndPassword(emailAuth, passwordAuth);
-      this.setState({ user, emailAuth: "", passwordAuth: "" });
-      this.props.navigation.navigate("Home", { user: this.state.user });
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  //   try {
+  //     const { user } = await firebase
+  //       .auth()
+  //       .signInWithEmailAndPassword(emailAuth, passwordAuth);
+  //     this.setState({ user, emailAuth: "", passwordAuth: "" });
+  //     this.props.navigation.navigate("Home", { user: this.state.user });
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
 
   render() {
     return (
@@ -56,7 +56,7 @@ class App extends Component {
                 onChangeText={passwordAuth => this.setState({ passwordAuth })}
               />
             </Item>
-            <Button block style={{ marginTop: 10 }} onPress={this.login}>
+            {/* <Button block style={{ marginTop: 10 }} onPress={{*this.login}}>
               <Text style={styles.textButton}>Fazer Login</Text>
             </Button>
             <Button
@@ -65,7 +65,7 @@ class App extends Component {
               onPress={() => this.props.navigation.navigate("CriarConta")}
             >
               <Text style={styles.textButton}>Criar Conta</Text>
-            </Button>
+            </Button> */}
           </Form>
         </Content>
       </Container>
@@ -74,9 +74,9 @@ class App extends Component {
 }
 
 const AppNavigator = createStackNavigator({
-  AddDenuncia,
-  App,
   Home,
+  App,
+  AddDenuncia,
   CriarConta,
   Camera
 });
