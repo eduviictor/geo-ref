@@ -43,6 +43,7 @@ class AddDenuncia extends Component {
     enderecoProblema: "",
     pontoReferencia: "",
     problema: "",
+    cidade: "",
     informacoesAdicionais: "",
     buttonDisable: false
   };
@@ -73,22 +74,28 @@ class AddDenuncia extends Component {
   };
 
   findCoordinates = () => {
+    this._requestPermission();
     Geolocation.getCurrentPosition(
       position => {
         console.log("peguei", position.coords);
         fetch(
-          "http://nominatim.openstreetmap.org/reverse?lat=" +
-            position.coords.latitude +
-            "&lon=" +
-            position.coords.longitude +
-            "&format=json"
+          `https://api.opencagedata.com/geocode/v1/json?key=b77df8fd45d4451982f93421aa8bb451&q=${encodeURIComponent(
+            position.coords.latitude + "," + position.coords.longitude
+          )}&pretty=1&no_annotations=1`
         )
-          .then(res => console.log("res", res.json()))
+          .then(res => res.json())
+          .then(data => {
+            this.setState({ adressGeo: data.results[0] });
+            this.setState({
+              enderecoProblema: this.state.adressGeo.formatted,
+              cidade: this.state.adressGeo.components.city_district
+            });
+          })
           .catch(err => console.log(err));
       },
       error => Alert.alert(error.message),
       {
-        enableHighAccuracy: false,
+        enableHighAccuracy: true,
         timeout: 20000
         // maximumAge: 1000
       }
@@ -97,18 +104,21 @@ class AddDenuncia extends Component {
 
   handleEmail = dataImage => {
     this.setState({ buttonDisable: true });
-    if (this.state.enderecoProblema === "" && !dataImage) {
-      Alert.alert("Campos obrigatórios não preenchidos!");
-    } else if (this.state.enderecoProblema === "" && dataImage) {
-      Alert.alert("Endereço deve ser informado!");
-    } else if (!dataImage && this.state.enderecoProblema !== "") {
-      Alert.alert("Imagem deve ser informada!");
+    if (
+      this.state.enderecoProblema === "" ||
+      !dataImage ||
+      this.state.cidade === "" ||
+      this.state.pontoReferencia === ""
+    ) {
+      Alert.alert("Campos obrigatórios não preenchidos (*)");
+      this.setState({ buttonDisable: false });
     } else {
       const objSend = {
         problema: this.state.problema,
         enderecoProblema: this.state.enderecoProblema,
         pontoReferencia: this.state.pontoReferencia,
         informacoesAdicionais: this.state.informacoesAdicionais,
+        cidade: this.state.cidade,
         base64Image: "data:image/jpeg;base64," + dataImage.base64
       };
       fetch("https://node-api-nodemailer.herokuapp.com/send", {
@@ -132,7 +142,7 @@ class AddDenuncia extends Component {
   };
 
   render() {
-    // console.log(this.state);
+    console.log("state", this.state);
     const dataImage =
       this.props.navigation.getParam("image") === undefined
         ? null
@@ -164,7 +174,16 @@ class AddDenuncia extends Component {
                 />
               </Item>
               <Item stackedLabel style={styles.itemForm}>
-                <Label>Ponto de referência</Label>
+                <Label>*Cidade</Label>
+                <Input
+                  // placeholder="endereco do problema"
+                  name="cidade"
+                  onChangeText={value => this.handleChange(value, "cidade")}
+                  value={this.state.cidade}
+                />
+              </Item>
+              <Item stackedLabel style={styles.itemForm}>
+                <Label>*Ponto de referência</Label>
                 <Input
                   // placeholder="ponto de referência"
                   name="pontoReferencia"
@@ -222,15 +241,15 @@ class AddDenuncia extends Component {
                   value={this.state.informacoesAdicionais}
                 />
               </Item>
-              {/* <Button
+              <Button
                 block
                 style={{ marginTop: 10 }}
                 onPress={this.findCoordinates}
               >
                 <Text style={styles.textButton}>Achar minhas cordenadas</Text>
-              </Button> */}
+              </Button>
               <Button
-                disabled={this.state.buttonDisable ? true : false}
+                disabled={this.state.buttonDisable}
                 block
                 style={{ marginTop: 10 }}
                 onPress={() => this.handleEmail(dataImage)}
@@ -256,7 +275,7 @@ const styles = StyleSheet.create({
   },
   content: {
     height: "auto",
-    width: "100%",
+    width: "100%"
     // backgroundColor: "red",
     // paddingTop: 20,
     // paddingLeft: 20,
