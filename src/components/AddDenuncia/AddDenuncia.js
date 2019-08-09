@@ -44,6 +44,8 @@ class AddDenuncia extends Component {
     pontoReferencia: "",
     problema: "",
     cidade: "",
+    latitude: null,
+    longitude: null,
     informacoesAdicionais: "",
     buttonDisable: false
   };
@@ -88,7 +90,9 @@ class AddDenuncia extends Component {
             this.setState({ adressGeo: data.results[0] });
             this.setState({
               enderecoProblema: this.state.adressGeo.formatted,
-              cidade: this.state.adressGeo.components.city_district
+              cidade: this.state.adressGeo.components.city_district,
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
             });
           })
           .catch(err => console.log(err));
@@ -96,8 +100,8 @@ class AddDenuncia extends Component {
       error => Alert.alert(error.message),
       {
         enableHighAccuracy: true,
-        timeout: 20000
-        // maximumAge: 1000
+        timeout: 20000,
+        maximumAge: 1000
       }
     );
   };
@@ -119,6 +123,8 @@ class AddDenuncia extends Component {
         pontoReferencia: this.state.pontoReferencia,
         informacoesAdicionais: this.state.informacoesAdicionais,
         cidade: this.state.cidade,
+        latitude: this.state.latitude,
+        longitude: this.state.longitude,
         base64Image: "data:image/jpeg;base64," + dataImage.base64
       };
       fetch("https://node-api-nodemailer.herokuapp.com/send", {
@@ -167,9 +173,9 @@ class AddDenuncia extends Component {
                 <Input
                   // placeholder="endereco do problema"
                   name="enderecoProblema"
-                  onChangeText={value =>
-                    this.handleChange(value, "enderecoProblema")
-                  }
+                  // onChangeText={value =>
+                  //   this.handleChange(value, "enderecoProblema")
+                  // }
                   value={this.state.enderecoProblema}
                 />
               </Item>
@@ -178,7 +184,7 @@ class AddDenuncia extends Component {
                 <Input
                   // placeholder="endereco do problema"
                   name="cidade"
-                  onChangeText={value => this.handleChange(value, "cidade")}
+                  // onChangeText={value => this.handleChange(value, "cidade")}
                   value={this.state.cidade}
                 />
               </Item>
