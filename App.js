@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, Alert } from "react-native";
 import { Container, Content, Form, Item, Input, Button } from "native-base";
 import firebase from "react-native-firebase";
 
@@ -18,12 +18,18 @@ class App extends Component {
   };
 
   static navigationOptions = {
-    title: "GeoRef"
+    title: "SaneReport"
   };
 
   login = async () => {
     this.setState({ loginDisable: true });
     const { emailAuth, passwordAuth } = this.state;
+
+    if (emailAuth === "" || passwordAuth === "") {
+      Alert.alert("É necessário preencher todos os campos!");
+      this.setState({ loginDisable: false });
+      return;
+    }
 
     try {
       const { user } = await firebase
@@ -33,7 +39,8 @@ class App extends Component {
       this.props.navigation.navigate("Home", { user: this.state.user });
       this.setState({ loginDisable: false });
     } catch (err) {
-      console.log(err);
+      Alert.alert("A senha ou o email estão incorretos.");
+      console.log("teste", err);
       this.setState({ loginDisable: false });
     }
   };
@@ -56,6 +63,7 @@ class App extends Component {
             <Item style={styles.itemForm}>
               <Input
                 placeholder="senha"
+                secureTextEntry={true}
                 value={this.state.passwordAuth}
                 onChangeText={passwordAuth => this.setState({ passwordAuth })}
               />

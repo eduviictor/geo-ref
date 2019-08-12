@@ -86,6 +86,7 @@ class CriarConta extends Component {
             <Item style={styles.itemForm}>
               <Input
                 placeholder="senha"
+                secureTextEntry={true}
                 value={this.state.password}
                 onChangeText={password => this.setState({ password })}
               />

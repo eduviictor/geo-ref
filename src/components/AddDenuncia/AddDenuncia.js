@@ -27,7 +27,9 @@ const problems = [
   "Esgoto quebrado",
   "Sistema de escoamento danificado/entupido",
   "Transbordamento de esgoto",
-  "Vazamento em esgoto"
+  "Vazamento em esgoto",
+  "Má disposição de resíduos",
+  "Problemas em drenagem"
 ];
 
 class AddDenuncia extends Component {
@@ -79,7 +81,10 @@ class AddDenuncia extends Component {
     this._requestPermission();
     Geolocation.getCurrentPosition(
       position => {
-        console.log("peguei", position.coords);
+        this.setState({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        });
         fetch(
           `https://api.opencagedata.com/geocode/v1/json?key=b77df8fd45d4451982f93421aa8bb451&q=${encodeURIComponent(
             position.coords.latitude + "," + position.coords.longitude
@@ -89,15 +94,17 @@ class AddDenuncia extends Component {
           .then(data => {
             this.setState({ adressGeo: data.results[0] });
             this.setState({
-              enderecoProblema: this.state.adressGeo.formatted,
-              cidade: this.state.adressGeo.components.city_district,
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude
+              enderecoProblema: data.results[0].formatted,
+              cidade: data.results[0].components.city_district
             });
           })
           .catch(err => console.log(err));
       },
-      error => Alert.alert(error.message),
+      error => {
+        if (error.message === "No location provider available.") {
+          Alert.alert("Ligue a localização do dispositivo.");
+        }
+      },
       {
         enableHighAccuracy: true,
         timeout: 20000,
@@ -137,12 +144,15 @@ class AddDenuncia extends Component {
       })
         .then(res => {
           Alert.alert("Denúncia realizada com sucesso!");
-          // () => this.props.navigation.goBack();
-          this.setState({ buttonDisable: false });
+          this.setState({ buttonDisable: false }, () =>
+            this.props.navigation.goBack()
+          );
         })
         .catch(err => {
           console.log(err);
-          this.setState({ buttonDisable: false });
+          this.setState({ buttonDisable: false }, () =>
+            this.props.navigation.goBack()
+          );
         });
     }
   };
@@ -171,7 +181,7 @@ class AddDenuncia extends Component {
               <Item stackedLabel style={styles.itemForm}>
                 <Label>*Endereço</Label>
                 <Input
-                  // placeholder="endereco do problema"
+                  placeholder="clique para pegar as coordenadas"
                   name="enderecoProblema"
                   // onChangeText={value =>
                   //   this.handleChange(value, "enderecoProblema")
@@ -182,7 +192,7 @@ class AddDenuncia extends Component {
               <Item stackedLabel style={styles.itemForm}>
                 <Label>*Cidade</Label>
                 <Input
-                  // placeholder="endereco do problema"
+                  placeholder="clique para pegar as coordenadas"
                   name="cidade"
                   // onChangeText={value => this.handleChange(value, "cidade")}
                   value={this.state.cidade}
@@ -252,7 +262,7 @@ class AddDenuncia extends Component {
                 style={{ marginTop: 10 }}
                 onPress={this.findCoordinates}
               >
-                <Text style={styles.textButton}>Achar minhas cordenadas</Text>
+                <Text style={styles.textButton}>Pegar minhas cordenadas</Text>
               </Button>
               <Button
                 disabled={this.state.buttonDisable}

@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import { Text, StyleSheet } from "react-native";
 import { Button, Container, Content } from "native-base";
+import email from "react-native-email";
 
 import firebase from "react-native-firebase";
 
 export default class Home extends Component {
   static navigationOptions = {
-    title: "GeoRef"
+    title: "SaneReport"
   };
 
   constructor(props) {
@@ -61,6 +62,13 @@ export default class Home extends Component {
   // // this.setState({ userData: data });
   // };
 
+  openEmail = () => {
+    const to = ["georef2019@gmail.com"];
+    email(to, {
+      cc: ["eduvictornobrega@gmail.com"]
+    });
+  };
+
   render() {
     console.log(this.state);
     return (
@@ -69,10 +77,13 @@ export default class Home extends Component {
         <Content>
           <Button
             primary
-            style={styles.buttonCadastrar}
+            style={styles.button}
             onPress={() => this.props.navigation.navigate("AddDenuncia")}
           >
             <Text style={styles.textButton}>Cadastrar Denúncia</Text>
+          </Button>
+          <Button primary style={styles.button} onPress={this.openEmail}>
+            <Text style={styles.textButton}>Fale Conosco</Text>
           </Button>
         </Content>
       </Container>
@@ -89,9 +100,10 @@ const styles = StyleSheet.create({
     height: "auto",
     padding: 20
   },
-  buttonCadastrar: {
+  button: {
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    marginBottom: 10
   },
   textButton: {
     color: "white"
