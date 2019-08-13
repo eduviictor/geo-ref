@@ -88,9 +88,9 @@ export default class Home extends Component {
           <Button
             primary
             style={styles.button}
-            onPress={() => this.props.navigation.navigate("Avaliacao")}
+            onPress={() => this.props.navigation.navigate("ListAvaliacoes")}
           >
-            <Text style={styles.textButton}>Avaliar Aplicativo</Text>
+            <Text style={styles.textButton}>Avaliações</Text>
           </Button>
         </Content>
       </Container>

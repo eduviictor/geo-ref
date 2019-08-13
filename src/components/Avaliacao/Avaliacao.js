@@ -88,15 +88,18 @@ export default class Avaliação extends Component {
     })
       .then(res => {
         Alert.alert("Avaliação cadastrada com sucesso!");
-        this.setState({ buttonDisable: false }, () =>
-          this.props.navigation.goBack()
-        );
+        this.setState({ buttonDisable: false }, () => {
+          this.props.navigation.goBack();
+          // console.log("navi", this.props.navigation);
+          // this.props.navigation.state.params.onSelect({ selected: true });
+        });
       })
       .catch(err => {
         console.log(err);
-        this.setState({ buttonDisable: false }, () =>
-          this.props.navigation.goBack()
-        );
+        this.setState({ buttonDisable: false }, () => {
+          this.props.navigation.goBack();
+          // this.props.navigation.state.params.onSelect({ selected: true });
+        });
       });
   };
 
