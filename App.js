@@ -8,6 +8,7 @@ import CriarConta from "./src/pages/CriarConta/criar-conta";
 import Home from "./src/pages/Home/home";
 import AddDenuncia from "./src/components/AddDenuncia/AddDenuncia";
 import Camera from "./src/components/Camera/Camera";
+import Avaliacao from "./src/components/Avaliacao/Avaliacao";
 
 class App extends Component {
   state = {
@@ -92,8 +93,9 @@ class App extends Component {
 
 const AppNavigator = createStackNavigator({
   App,
-  AddDenuncia,
   Home,
+  Avaliacao,
+  AddDenuncia,
   CriarConta,
   Camera
 });

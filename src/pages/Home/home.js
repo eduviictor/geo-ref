@@ -85,6 +85,13 @@ export default class Home extends Component {
           <Button primary style={styles.button} onPress={this.openEmail}>
             <Text style={styles.textButton}>Fale Conosco</Text>
           </Button>
+          <Button
+            primary
+            style={styles.button}
+            onPress={() => this.props.navigation.navigate("Avaliacao")}
+          >
+            <Text style={styles.textButton}>Avaliar Aplicativo</Text>
+          </Button>
         </Content>
       </Container>
     );
